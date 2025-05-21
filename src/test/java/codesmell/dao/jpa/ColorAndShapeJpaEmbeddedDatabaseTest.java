@@ -7,6 +7,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -17,7 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest(showSql = true)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -38,6 +39,25 @@ class ColorAndShapeJpaEmbeddedDatabaseTest {
     @Autowired
     ColorAndShapeRepository rep;
 
+    @Test
+    @Sql(scripts = "/test-data.sql")
+    void test_collision_on_insert() {
+        assertEquals(1, rep.count());
+        
+        ColorAndShapeEntity newEntity = new ColorAndShapeEntity();
+        newEntity.setShape("Square");
+        newEntity.setColor("Blue");
+
+        assertNull(newEntity.getId());
+        assertEquals(1, rep.count());
+
+        // insert attempt
+        assertThrows(
+            DataIntegrityViolationException.class,
+            () -> rep.save(newEntity)
+         );
+    }
+    
     @Test
     void test_managed_update() {
         ColorAndShapeEntity newEntity = new ColorAndShapeEntity();

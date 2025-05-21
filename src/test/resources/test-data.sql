@@ -1,0 +1,1 @@
+INSERT INTO color_and_shape (shape, color) VALUES ('Square', 'Blue');
