@@ -1,7 +1,6 @@
 package codesmell.dao.mybatis.embed;
 
 import codesmell.config.MyBatisConfig;
-import codesmell.dao.jpa.ColorAndShapeEntity;
 import codesmell.dao.mybatis.ShapeDao;
 import codesmell.dao.mybatis.ShapeDto;
 import org.junit.jupiter.api.Test;
@@ -10,15 +9,12 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
