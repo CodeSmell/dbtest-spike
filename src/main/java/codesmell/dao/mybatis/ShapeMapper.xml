@@ -9,8 +9,8 @@
 		keyColumn="id"
 		keyProperty="shape.id"
 		parameterType="codesmell.dao.mybatis.ShapeDto">
-		INSERT INTO color_and_shape (shape, color, description) values 
-		(#{shape.shape}, #{shape.color}, #{shape.description})
+		INSERT INTO color_and_shape (shape, color, description)
+		VALUES (#{shape.shape}, #{shape.color}, #{shape.description})
 	</insert>
 	
 	<insert id="upsertShape"
@@ -19,16 +19,27 @@
 		keyColumn="id"
 		keyProperty="shape.id"
 		parameterType="codesmell.dao.mybatis.ShapeDto">	
-		INSERT INTO color_and_shape (shape, color, description) values 
-		(#{shape.shape}, #{shape.color}, #{shape.description})
-			ON CONFLICT (shape, color) DO
+		INSERT INTO color_and_shape (shape, color, description) 
+			VALUES (#{shape.shape}, #{shape.color}, #{shape.description})
+		
+		ON CONFLICT (shape, color) DO
+		
 		UPDATE SET
-		shape = #{shape.shape},
-		color = #{shape.color},
-		description = #{description}
+			shape = #{shape.shape},
+			color = #{shape.color},
+			description = #{shape.description}
 	</insert>
 
 	<select id="findShapeById" resultType="codesmell.dao.mybatis.ShapeDto">
-		SELECT id, shape, color, description FROM color_and_shape WHERE id = #{id}
+		SELECT id, shape, color, description 
+		FROM color_and_shape 
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findByShapeColor" resultType="codesmell.dao.mybatis.ShapeDto">
+		SELECT id, shape, color, description 
+		FROM color_and_shape 
+		WHERE shape = #{shape}
+		AND color = #{color}
 	</select>
 </mapper>

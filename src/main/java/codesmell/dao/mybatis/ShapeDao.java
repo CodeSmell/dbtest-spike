@@ -12,5 +12,7 @@ public interface ShapeDao {
     void upsertShape(@Param("shape") ShapeDto shape);
     
     ShapeDto findShapeById(@Param("id") Long id);
+    
+    ShapeDto findByShapeColor(@Param("shape") String shape, @Param("color") String color);
 
 }
