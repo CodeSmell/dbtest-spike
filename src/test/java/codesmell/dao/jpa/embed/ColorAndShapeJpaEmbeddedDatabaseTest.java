@@ -1,5 +1,7 @@
-package codesmell.dao.jpa;
+package codesmell.dao.jpa.embed;
 
+import codesmell.dao.jpa.ColorAndShapeEntity;
+import codesmell.dao.jpa.ColorAndShapeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -20,6 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Note: separated embedded and testcontainer tests by package 
+ * that required the base package in @EntityScan and @EnableJpaRepositories
+ */
+@ActiveProfiles("test")
 @DataJpaTest(showSql = true)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @Sql(scripts = "/shape.ddl", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
@@ -29,8 +37,8 @@ import static org.junit.jupiter.api.Assertions.*;
 //@TestPropertySource(properties = {
 //    "spring.jpa.hibernate.ddl-auto=create-drop"
 //})
-@EnableJpaRepositories()
-@EntityScan()
+@EnableJpaRepositories("codesmell.dao.jpa")
+@EntityScan("codesmell.dao.jpa")
 @ContextConfiguration(classes = {
     ColorAndShapeJpaEmbeddedDatabaseTest.TestConfig.class
 })
