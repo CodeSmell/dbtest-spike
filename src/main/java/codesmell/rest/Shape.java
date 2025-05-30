@@ -1,46 +1,47 @@
-package codesmell.dao.mybatis;
+package codesmell.rest;
 
-public class ShapeDto {
+public class Shape {
 
     private Long id;
-    
     private String shape;
-    
     private String color;
-    
     private String description;
-    
-    public static ShapeDtoBuilder builder() {
-        return new ShapeDto.ShapeDtoBuilder();
+
+    private Shape() {
+        // force use of builder
     }
 
-    public static class ShapeDtoBuilder {
-        private ShapeDto managedInstance = new ShapeDto();
+    public static ShapeBuilder builder() {
+        return new Shape.ShapeBuilder();
+    }
 
-        public ShapeDtoBuilder id(Long id) {
+    public static class ShapeBuilder {
+        private Shape managedInstance = new Shape();
+
+        public ShapeBuilder id(Long id) {
             managedInstance.id = id;
             return this;
         }
 
-        public ShapeDtoBuilder shape(String shape) {
+        public ShapeBuilder shape(String shape) {
             managedInstance.shape = shape;
             return this;
         }
 
-        public ShapeDtoBuilder color(String color) {
+        public ShapeBuilder color(String color) {
             managedInstance.color = color;
             return this;
         }
 
-        public ShapeDtoBuilder description(String description) {
+        public ShapeBuilder description(String description) {
             managedInstance.description = description;
             return this;
         }
         
-        public ShapeDto build() {
+        public Shape build() {
             return managedInstance;
         }
-    }    
+    }
 
     public Long getId() {
         return id;
@@ -73,5 +74,5 @@ public class ShapeDto {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
 }

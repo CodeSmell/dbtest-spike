@@ -9,21 +9,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Note: should not use @TestContainers when reusing a container
@@ -39,9 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @EnableJpaRepositories("codesmell.dao.jpa")
 @EntityScan("codesmell.dao.jpa")
 //@Testcontainers
-@ContextConfiguration(classes = {
-    ColorAndShapeJpaTestContainerTest.TestConfig.class
-})
 class ColorAndShapeJpaTestContainerTest {
 
     @Autowired
@@ -91,9 +89,11 @@ class ColorAndShapeJpaTestContainerTest {
                 DataIntegrityViolationException.class,
                 () -> rep.save(newEntity));
     }
-
-    @TestConfiguration
-    public static class TestConfig {
+    
+    @Test
+    void test_not_found_by_id() {
+        Optional<ColorAndShapeEntity> fetchedEntityOpt = rep.findById(Long.MAX_VALUE);
+        assertTrue(fetchedEntityOpt.isEmpty());
     }
 
 }

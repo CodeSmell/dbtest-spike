@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.test.context.ActiveProfiles;
@@ -30,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     "spring.jpa.hibernate.ddl-auto=none"
 })
 @ContextConfiguration(classes = {
-    MyBatisConfig.class,
-    ShapeMybatisEmbeddedDatabaseTest.TestConfig.class
+    MyBatisConfig.class
 })
 class ShapeMybatisEmbeddedDatabaseTest {
 
@@ -86,12 +84,20 @@ class ShapeMybatisEmbeddedDatabaseTest {
 
         ShapeDto fetchShape = dao.findShapeById(newShape.getId());
         assertEquals(fetchShape.getId(), newShape.getId());
-        assertEquals("Sphere", newShape.getShape());
-        assertEquals("Gray", newShape.getColor());
+        assertEquals("Sphere", fetchShape.getShape());
+        assertEquals("Gray", fetchShape.getColor());
     }
     
-    @Configuration
-    public static class TestConfig {
+    @Test
+    void test_not_found_by_id() {
+        ShapeDto dto = dao.findShapeById(Long.MAX_VALUE);
+        assertNull(dto);
+    }
+    
+    @Test
+    void test_not_found_by_data() {
+        ShapeDto dto = dao.findByShapeColor("Circle", "Green");
+        assertNull(dto);
     }
 
 }

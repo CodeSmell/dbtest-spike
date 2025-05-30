@@ -8,11 +8,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -21,7 +19,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Note: separated embedded and testcontainer tests by package 
@@ -39,9 +38,6 @@ import static org.junit.jupiter.api.Assertions.*;
 //})
 @EnableJpaRepositories("codesmell.dao.jpa")
 @EntityScan("codesmell.dao.jpa")
-@ContextConfiguration(classes = {
-    ColorAndShapeJpaEmbeddedDatabaseTest.TestConfig.class
-})
 class ColorAndShapeJpaEmbeddedDatabaseTest {
     
     @Autowired
@@ -164,10 +160,11 @@ class ColorAndShapeJpaEmbeddedDatabaseTest {
         assertEquals(null, fetchedEntity.getDescription());
         assertEquals(1, rep.count());
     }
-
     
-    @Configuration
-    public static class TestConfig {
+    @Test
+    void test_not_found_by_id() {
+        Optional<ColorAndShapeEntity> fetchedEntityOpt = rep.findById(Long.MAX_VALUE);
+        assertTrue(fetchedEntityOpt.isEmpty());
     }
 
 }

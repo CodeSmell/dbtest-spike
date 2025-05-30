@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Note: should not use @TestContainers when reusing a container
- * Note: separated embedded and testcontainer tests by package 
+ * Note: should not use @TestContainers when reusing a container Note: separated
+ * embedded and testcontainer tests by package
  */
 @SpringBootTest
 @ActiveProfiles("test")
@@ -35,31 +34,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = "/test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @ContextConfiguration(classes = {
-    MyBatisConfig.class,
-    ShapeMybatisTestContainerTest.TestConfig.class
+    MyBatisConfig.class
 })
 class ShapeMybatisTestContainerTest {
 
     @Autowired
     ShapeDao dao;
-    
+
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
-        .withDatabaseName("test")
-        .withUsername("test")
-        .withPassword("spike")
-        .withReuse(true)
-        .withInitScript("shape.ddl");
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("spike")
+            .withReuse(true)
+            .withInitScript("shape.ddl");
 
     @BeforeAll
     static void setup() {
-        // not sure why reuse error showed up in mybastis 
+        // not sure why reuse error showed up in mybastis
         // Error was
-        // To enable reuse of containers, you must set 'testcontainers.reuse.enable=true' in a file located at ...
+        // To enable reuse of containers, you must set
+        // 'testcontainers.reuse.enable=true' in a file located at ...
         TestcontainersConfiguration.getInstance().updateUserConfig("testcontainers.reuse.enable", "true");
         postgres.start();
     }
-    
+
     @AfterAll
     static void cleanup() {
         postgres.stop();
@@ -75,10 +74,9 @@ class ShapeMybatisTestContainerTest {
 
         assertThrows(
             DuplicateKeyException.class,
-            () -> dao.insertShape(newShape)
-        );
+            () -> dao.insertShape(newShape));
     }
-    
+
     /**
      * unlike H2 we can run this now
      */
@@ -90,7 +88,7 @@ class ShapeMybatisTestContainerTest {
         assertEquals("Square", fetchShape.getShape());
         assertEquals("Blue", fetchShape.getColor());
         assertEquals(null, fetchShape.getDescription());
-        
+
         ShapeDto newShape = new ShapeDto();
         newShape.setShape("Square");
         newShape.setColor("Blue");
@@ -101,7 +99,7 @@ class ShapeMybatisTestContainerTest {
         dao.upsertShape(newShape);
         assertNotNull(newShape.getId());
         assertEquals(fetchShape.getId(), newShape.getId());
-        
+
         ShapeDto fetchShapeAgain = dao.findByShapeColor("Square", "Blue");
         assertNotNull(fetchShapeAgain);
         assertNotNull(fetchShapeAgain.getId());
@@ -110,7 +108,7 @@ class ShapeMybatisTestContainerTest {
         assertEquals("Blue", fetchShapeAgain.getColor());
         assertEquals("UPSERT", fetchShapeAgain.getDescription());
     }
-    
+
     @Test
     void test_insert_and_retrieve() {
         ShapeDto newShape = new ShapeDto();
@@ -131,8 +129,16 @@ class ShapeMybatisTestContainerTest {
         assertEquals("Gray", newShape.getColor());
     }
 
-    
-    @Configuration
-    public static class TestConfig {
+    @Test
+    void test_not_found_by_id() {
+        ShapeDto dto = dao.findShapeById(Long.MAX_VALUE);
+        assertNull(dto);
     }
+    
+    @Test
+    void test_not_found_by_data() {
+        ShapeDto dto = dao.findByShapeColor("Circle", "Green");
+        assertNull(dto);
+    }
+
 }
